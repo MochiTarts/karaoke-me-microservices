@@ -1,0 +1,7 @@
+openai-whisper
+uvicorn[standard]
+fastapi
+python-multipart
+replicate
+openai
+pydub

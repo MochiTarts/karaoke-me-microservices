@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  whisper:
+    image: "whisper"
+    build: ./whisper
+    ports:
+      - "80:5000"
+      - "443:5000"
+    volumes:
+      - ./whisper:/app
+    restart: always
+    networks:
+      - karaoke-services
+
+networks:
+  karaoke-services:
+    driver: bridge

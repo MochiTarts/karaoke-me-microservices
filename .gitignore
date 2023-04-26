@@ -1,3 +1,8 @@
+# Test files and large files
+*.mp3
+*.wav
+*.pt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
