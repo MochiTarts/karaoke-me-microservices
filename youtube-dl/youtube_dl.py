@@ -66,5 +66,5 @@ def get_youtube(url):
 
   s3 = boto3.client('s3')
   s3_key = f'{filename}.flac'
-  s3.upload_fileobj(tempfile, os.environ['BUCKET_NAME'], s3_key)
-  return f'https://{os.environ["BUCKET_NAME"]}.s3.amazonaws.com/{s3_key}'
+  s3.upload_fileobj(tempfile, os.environ.get('BUCKET_NAME'), s3_key)
+  return f'https://{os.environ.get("BUCKET_NAME")}.s3.{os.environ.get("REGION")}.amazonaws.com/{s3_key}'

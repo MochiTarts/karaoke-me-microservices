@@ -13,6 +13,16 @@ services:
     networks:
       - karaoke-services
 
+  split-audio:
+    image: "split-audio:latest"
+    build: ./split
+    volumes:
+      - ./split/app.py:/var/task/app.py
+      - ~/.aws:/root/.aws:ro
+    restart: always
+    ports:
+      - "9000:8080"
+
 networks:
   karaoke-services:
     driver: bridge
