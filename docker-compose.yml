@@ -10,8 +10,6 @@ services:
     volumes:
       - ./whisper:/app
     restart: always
-    networks:
-      - karaoke-services
 
   split-audio:
     image: "split-audio:latest"
@@ -23,6 +21,12 @@ services:
     ports:
       - "9000:8080"
 
-networks:
-  karaoke-services:
-    driver: bridge
+  youtube-dl:
+    image: "youtube-dl:latest"
+    build: ./youtube-dl
+    volumes:
+      - ./youtube-dl/youtube_dl.py:/var/task/youtube_dl.py
+      - ~/.aws:/root/.aws:ro
+    restart: always
+    ports:
+      - "9000:8080"

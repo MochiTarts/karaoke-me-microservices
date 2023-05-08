@@ -96,6 +96,7 @@ def handle_split(s3_yt_audio_url, connection_id, apig_management_api):
   
   try:
     s3_vocals_url, s3_accomp_url = split_audio_spleeter(f'{lambda_tmp_dir}/{yt_audio_file}', yt_audio_file, apig_management_api, connection_id)
+    #s3_vocals_url, s3_accomp_url = split_audio_demucs(f'{lambda_tmp_dir}/{yt_audio_file}', yt_audio_file, apig_management_api, connection_id)
   except Exception as e:
     logger.exception(str(e))
     apig_management_api.post_to_connection(
@@ -165,7 +166,7 @@ def split_audio_spleeter(audio_path, audio_file, apig_management_api, connection
           f'https://{os.environ.get("BUCKET_NAME")}.s3.{os.environ.get("REGION")}.amazonaws.com/{s3_accomp_key}')
 
 
-def split_audio_demucs(audio_path, audio_filename, apig_management_api, connection_id):
+def split_audio_demucs(audio_path, audio_file, apig_management_api, connection_id):
   # Use demucs to split the audio file into vocals and accompaniment
   logger.info("Running demucs...")
   apig_management_api.post_to_connection(
@@ -186,14 +187,15 @@ def split_audio_demucs(audio_path, audio_filename, apig_management_api, connecti
   logger.info("Uploading split audio files to s3...")
   apig_management_api.post_to_connection(
     ConnectionId=connection_id, Data=json.dumps({"status": "processing", "message": "Uploading split audio files to s3..."}))
+  audio_filename = audio_file.split(".")[0] # yt_audio
   # ie. /tmp/htdemucs/yt_audio
-  separated_tracks_path = f'{lambda_tmp_dir}/htdemucs/{audio_filename.split(".")[0]}'
+  separated_tracks_path = f'{lambda_tmp_dir}/htdemucs/{audio_filename}'
   
   s3_vocal_key = f'vocals/{uuid.uuid4()}.mp3'
   s3_accomp_key = f'accompaniment/{uuid.uuid4()}.mp3'
 
-  s3.upload_file(f'{separated_tracks_path}/vocals.mp3', os.environ['BUCKET_NAME'], s3_vocal_key)
-  s3.upload_file(f'{separated_tracks_path}/no_vocals.mp3', os.environ['BUCKET_NAME'], s3_accomp_key)
+  s3.upload_file(f'{separated_tracks_path}/vocals.mp3', os.environ.get("BUCKET_NAME"), s3_vocal_key)
+  s3.upload_file(f'{separated_tracks_path}/no_vocals.mp3', os.environ.get("BUCKET_NAME"), s3_accomp_key)
   
   logger.info("Finished uploading split audio files to s3")
 

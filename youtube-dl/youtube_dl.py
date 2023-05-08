@@ -1,4 +1,6 @@
-import json, uuid, os, shutil, yt_dlp, tempfile, boto3
+import json, uuid, os, shutil, yt_dlp, boto3, io
+
+lambda_tmp_dir = '/tmp'
 
 def handler(event, context):
   try:
@@ -32,17 +34,6 @@ def handler(event, context):
     "body": json.dumps({"url": s3_url})
   }
 
-lambda_tmp_dir = '/tmp'
-
-def write_file_to_stream(path):
-  temp = tempfile.NamedTemporaryFile()
-  with open(path, 'rb') as f:
-    shutil.copyfileobj(f, temp)
-    temp.flush()
-  temp.seek(0)
-  shutil.rmtree(f'{lambda_tmp_dir}/yt-dlp')
-  return temp
-
 
 def get_youtube(url):
   # Use youtube_dl to download the audio file from the given YouTube URL.
@@ -62,9 +53,11 @@ def get_youtube(url):
   
   # Return the audio stream. And remove the file after the request is done.
   path = f'{lambda_tmp_dir}/yt-dlp/{filename}.flac'
-  tempfile = write_file_to_stream(path)
 
   s3 = boto3.client('s3')
   s3_key = f'{filename}.flac'
-  s3.upload_fileobj(tempfile, os.environ.get('BUCKET_NAME'), s3_key)
+  s3.upload_file(path, os.environ.get('BUCKET_NAME'), s3_key)
+
+  shutil.rmtree(f'{lambda_tmp_dir}/yt-dlp', ignore_errors=True)
+
   return f'https://{os.environ.get("BUCKET_NAME")}.s3.{os.environ.get("REGION")}.amazonaws.com/{s3_key}'

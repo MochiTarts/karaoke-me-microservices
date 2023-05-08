@@ -1,0 +1,6 @@
+**/._*
+**/venv/**
+**/__pycache__/**
+**/*.mp3/**
+**/pretrained_models/**
+**/separated/**

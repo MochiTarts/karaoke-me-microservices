@@ -1,7 +1,10 @@
 # Test files and large files
 *.mp3
+*.flac
 *.wav
 *.pt
+pretrained_models/
+separated/
 
 layer/
 

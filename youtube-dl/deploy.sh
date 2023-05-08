@@ -3,6 +3,10 @@
 # Set variables (using .env file)
 source .env
 
+# Echo variables
+echo "BUCKET_NAME=$BUCKET_NAME"
+echo "REGION=$REGION"
+
 # Login to AWS ECR
 aws ecr get-login-password \
   --region us-east-2 \
@@ -24,6 +28,16 @@ docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
 aws lambda update-function-code \
   --function-name youtube-dl \
   --image-uri $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
+
+# Delete untagged images from AWS ECR
+IMAGES_TO_DELETE=$(aws ecr list-images \
+  --repository-name $REPO_NAME \
+  --filter "tagStatus=UNTAGGED" \
+  --query 'imageIds[*]' \
+  --output json)
+aws ecr batch-delete-image \
+  --repository-name $REPO_NAME \
+  --image-ids "$IMAGES_TO_DELETE" || true
 
 # clean up
 docker system prune -a -f
