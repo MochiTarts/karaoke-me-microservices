@@ -1,6 +1,7 @@
 import json, uuid, os, shutil, yt_dlp, boto3, io
 
 lambda_tmp_dir = '/tmp'
+allowed_origins = ['http://localhost:3000']
 
 def handler(event, context):
   try:
@@ -30,6 +31,7 @@ def handler(event, context):
     "statusCode": 200,
     "headers": {
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": allowed_origins, # Required for CORS support to work
     },
     "body": json.dumps({"url": s3_url})
   }

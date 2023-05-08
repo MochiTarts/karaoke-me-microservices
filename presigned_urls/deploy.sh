@@ -4,7 +4,7 @@
 source .env
 
 # Zip the function code (app.py, no dependencies)
-zip -r9 function.zip app.py
+zip -r9 function.zip lambda_function.py
 
 # Deploy the function code to AWS Lambda (without user input)
 aws lambda update-function-code \

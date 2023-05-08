@@ -4,6 +4,7 @@ s3 = boto3.client('s3')
 lambda_tmp_dir = '/tmp'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+allowed_origins = ['http://localhost:3000']
 
 def handler(event, context):
   """
@@ -27,6 +28,7 @@ def handler(event, context):
       "statusCode": 400,
       "headers": {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": allowed_origins, # Required for CORS support to work
       },
       "body": json.dumps({"error": f"Missing required parameter: {e}"})
     }
@@ -42,6 +44,7 @@ def handler(event, context):
       "statusCode": 400,
       "headers": {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": allowed_origins,
       },
       "body": json.dumps({"error": f"Invalid action: {action}"})
     }
@@ -50,6 +53,7 @@ def handler(event, context):
     "statusCode": 200,
     "headers": {
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": allowed_origins,
     },
     "body": json.dumps({"presigned_url": url})
   }
